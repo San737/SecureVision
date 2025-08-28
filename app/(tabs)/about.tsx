@@ -3,7 +3,8 @@ import { Text, View, StyleSheet } from 'react-native';
 export default function AboutScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>About screen</Text>
+  <Text style={{ color: 'white', fontWeight: '700', fontSize: 18 }}>SecureVision</Text>
+  <Text style={{ color: 'white', marginTop: 6 }}>Demo app to capture and seal photos with provenance metadata and verify them using a simulated C2PA flow.</Text>
     </View>
   );
 }

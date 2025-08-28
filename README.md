@@ -1,6 +1,6 @@
-# Welcome to your Expo app 👋
+# SecureVision — Capture, Seal, Verify
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+SecureVision is a React Native app (Expo Router) that captures photos, attaches provenance-like metadata, and simulates sealing and verification inspired by C2PA.
 
 ## Get started
 
@@ -10,7 +10,13 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Install native modules required by the app (already added to package.json when you ran install above). If you see missing module errors, run:
+
+   ```bash
+   npx expo install expo-camera expo-location expo-device expo-image-picker @react-native-async-storage/async-storage react-native-get-random-values uuid
+   ```
+
+3. Start the app
 
    ```bash
    npx expo start
@@ -24,6 +30,16 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Features
+
+- Camera capture with preview (expo-camera)
+- Collects timestamp, GPS (with permission), and device id
+- Simulated C2PA sealing: writes a manifest sidecar and copies image to app storage
+- Verify screen: pick an image and validate if a sidecar manifest exists
+- Sealed list and details screens
+
+Note: Real C2PA embedding requires native/Rust SDKs. This project uses a local demo flow — wire `utils/c2pa.ts` to your backend for production.
 
 ## Get a fresh project
 
