@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Image, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { verifyImage } from '../../utils/c2pa';
 
@@ -26,7 +26,7 @@ export default function VerifyScreen() {
   };
 
   return (
-    <View style={{ padding: 16, gap: 12 }}>
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 32 }}>
       <TouchableOpacity onPress={pick} style={styles.primary}><Text style={styles.primaryText}>Pick Image</Text></TouchableOpacity>
       {picked && <Image source={{ uri: picked }} style={{ width: '100%', height: 280, borderRadius: 12, backgroundColor: '#000' }} resizeMode="contain"/>}
       <TouchableOpacity onPress={onVerify} disabled={!picked || busy} style={styles.primary}>
@@ -61,7 +61,7 @@ export default function VerifyScreen() {
           )}
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 }
 

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
-import { getSealedItems } from '../../utils/storage';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { getSealedItems, deleteSealedItem } from '../../utils/storage';
 import { router, useFocusEffect } from 'expo-router';
+import * as FileSystem from 'expo-file-system';
 
 export default function SealedListScreen() {
   const [items, setItems] = useState<any[]>([]);
@@ -19,6 +20,23 @@ export default function SealedListScreen() {
     const list = await getSealedItems();
     setItems(list);
     setLoading(false);
+  };
+
+  const onDelete = async (id: string, uri: string) => {
+    try {
+  await deleteSealedItem(id);
+      // Best-effort: remove the image file and its sidecar manifest if present
+      if (uri) {
+        try { await FileSystem.deleteAsync(uri, { idempotent: true }); } catch {}
+      }
+      const sidecar = (uri || '').replace(/\.[^./\\?]+(\?.*)?$/, '') + '.manifest.json';
+      try { await FileSystem.deleteAsync(sidecar, { idempotent: true }); } catch {}
+      // Refresh list
+      const list = await getSealedItems();
+      setItems(list);
+    } catch (e: any) {
+      Alert.alert('Delete failed', String(e?.message ?? e));
+    }
   };
 
   if (loading) {
@@ -39,14 +57,19 @@ export default function SealedListScreen() {
       data={items}
       keyExtractor={(it) => it.id}
       renderItem={({ item }) => (
-  <TouchableOpacity style={styles.row} onPress={() => router.push({ pathname: '/details', params: { id: item.id } } as any)}>
-          <Image source={{ uri: item.uri }} style={styles.thumb} />
-          <View style={{ flex: 1 }}>
-            <Text numberOfLines={1} style={styles.title}>{item.manifest?.author ?? 'SecureVision'}</Text>
-            <Text style={styles.meta}>{new Date(item.createdAt).toLocaleString()}</Text>
-            <Text style={[styles.badge, item.status === 'valid' ? styles.badgeValid : item.status === 'tampered' ? styles.badgeBad : styles.badgeNeutral]}>{item.status}</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.row}>
+          <TouchableOpacity style={{ flexDirection: 'row', flex: 1, alignItems: 'center', gap: 12 }} onPress={() => router.push({ pathname: '/details', params: { id: item.id } } as any)}>
+            <Image source={{ uri: item.uri }} style={styles.thumb} />
+            <View style={{ flex: 1 }}>
+              <Text numberOfLines={1} style={styles.title}>{item.manifest?.author ?? 'SecureVision'}</Text>
+              <Text style={styles.meta}>{new Date(item.createdAt).toLocaleString()}</Text>
+              <Text style={[styles.badge, item.status === 'valid' ? styles.badgeValid : item.status === 'tampered' ? styles.badgeBad : styles.badgeNeutral]}>{item.status}</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onDelete(item.id, item.uri)} style={styles.deleteBtn}>
+            <Text style={styles.deleteText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
       )}
     />
   );
@@ -62,4 +85,6 @@ const styles = StyleSheet.create({
   badgeValid: { backgroundColor: '#b7f7c5' },
   badgeBad: { backgroundColor: '#f7b7b7' },
   badgeNeutral: { backgroundColor: '#f0e68c' },
+  deleteBtn: { backgroundColor: '#ff4d4f', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
+  deleteText: { color: '#fff', fontWeight: '700' },
 });

@@ -27,3 +27,12 @@ export async function getSealedItem(id: string): Promise<SealedItem | null> {
   const list = await getSealedItems();
   return list.find(i => i.id === id) ?? null;
 }
+
+export async function deleteSealedItem(id: string): Promise<SealedItem | null> {
+  const list = await getSealedItems();
+  const idx = list.findIndex(i => i.id === id);
+  if (idx === -1) return null;
+  const [removed] = list.splice(idx, 1);
+  await AsyncStorage.setItem(KEY, JSON.stringify(list));
+  return removed ?? null;
+}

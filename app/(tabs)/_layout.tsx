@@ -13,6 +13,8 @@ export default function TabLayout() {
         tabBarStyle: { backgroundColor: '#25292e' },
       }}
     >
+  {/* Hide the index route so it doesn't show as a tab */}
+  <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen
         name="camera"
         options={{

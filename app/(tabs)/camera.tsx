@@ -5,12 +5,14 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Device from 'expo-device';
 import { router } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function CameraScreen() {
   const cameraRef = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [locGranted, setLocGranted] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     (async () => {
@@ -78,9 +80,13 @@ export default function CameraScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000' }}>
-      <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
+      {isFocused ? (
+        <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
+      ) : (
+        <View style={{ flex: 1, backgroundColor: '#000' }} />
+      )}
       <View style={styles.controls}>
-        <TouchableOpacity onPress={takePhoto} style={styles.captureBtn} disabled={loading}>
+        <TouchableOpacity onPress={takePhoto} style={styles.captureBtn} disabled={loading || !isFocused}>
           {loading ? <ActivityIndicator color="#000"/> : <Text style={styles.captureText}>Capture</Text>}
         </TouchableOpacity>
       </View>

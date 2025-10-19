@@ -1,9 +1,4 @@
-import { useEffect } from 'react';
-import { router } from 'expo-router';
-
 export default function Index() {
-  useEffect(() => {
-    router.replace('/(tabs)/camera' as any);
-  }, []);
+  // No redirect needed; Tabs initialRouteName handles first screen.
   return null;
 }
